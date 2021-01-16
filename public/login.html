@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                background-color: #9cc3d5ff;
+            }
+
+            h1 {
+                color: white;
+                text-align: center;
+                font-family: monospace;
+            }
+
+            p {
+                font-family: monospace;
+                color: white;
+                font-size: 15px;
+                text-align: center;
+            }
+        </style>
+        <script>
+            function getinfo() {
+                let user = document.getElementById("username").value;
+                let pass = document.getElementById("password").value;
+                let info = {
+                    username: user,
+                    password: pass,
+                };
+                fetch("/api/login", {
+                    method: "post",
+                    headers: {
+                        Accept: "application/json, text/plain, */*",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(info),
+                })
+                    .then((res) => res.json())
+                    .then((res) => {
+                        console.log(res.token);
+                        let token = res.token;
+                        localStorage.setItem("token", token);
+                        window.open("https://Quack.htong1.repl.co/home.html", "_parent");
+                    });
+            }
+        </script>
+    </head>
+
+    <body>
+        <h1>Quack!:D™</h1>
+        <h3>Welcome Back!</h3>
+        <br />
+        <br />
+        Username:
+        <input type="text" id="username" />
+        <br />
+        <br />
+        Password:
+        <input type="text" id="password" />
+        <br />
+        <br />
+        <button type="button" onclick="getinfo()">Log In</button>
+    </body>
+</html>

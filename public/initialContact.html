@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                background-color: #9cc3d5ff;
+            }
+
+            h1 {
+                color: white;
+                text-align: center;
+                font-family: monospace;
+            }
+
+            p {
+                font-family: monospace;
+                font-size: 15px;
+                text-align: center;
+                color: white;
+            }
+
+            h4 {
+                color: white;
+                text-align: center;
+                font-family: monospace;
+            }
+
+            #email {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #quack {
+                text-align: center;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Welcome to Quack!:D™</h1>
+        <h4>Where 21st century quacking became a thing.™</h4>
+        <br />
+        <p>Please provide the information below to sign up!</p>
+        <strong><p>Enter your email address below.</p></strong>
+        <textarea id="email" rows="5" cols="40"></textarea>
+        <br />
+        <br />
+        <center>
+            <button type="button" id="quack" onclick="signUp()">Get Quacking!</button>
+        </center>
+        <br />
+        <br />
+        <center>
+            <div id="signupcomplete"></div>
+        </center>
+        <script>
+            function signUp() {
+                let email = document.getElementById("email").value;
+                let result = document.getElementById("signupcomplete");
+                if (email.indexOf("@") > 1 && email.lastIndexOf(".") > email.indexOf("@")) {
+                    let url = "/verifyemail/" + email;
+                    fetch(url)
+                        .then((response) => response.json())
+
+                        .then((res) => {
+                            result.innerHTML = "An email was sent to " + res.success + ". Please verify your email to begin quacking!";
+                        });
+                } else {
+                    result.innerHTML = "Please input a valid email address to continue.";
+                }
+            }
+
+            function makeLink() {}
+        </script>
+    </body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                background-color: #9cc3d5ff;
+            }
+
+            h1 {
+                color: white;
+                text-align: center;
+                font-family: monospace;
+            }
+
+            p {
+                font-family: verdana;
+                font-size: 20px;
+                color: white;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+
+    <body>
+        <center>
+            <h1>Become a Quack! :D</h1>
+            <p>Where 21st century quacking became a thing!™</p>
+        </center>
+        <br />
+        <br />
+        <p>
+            First name:
+            <br />
+            <input type="text" name="First Name" onchange="checkFirstName(this)" />
+            <br />
+            <br />
+            Last name:
+            <br />
+            <input type="text" name="Last Name" onchange="checkLastName(this)" />
+            <br />
+            <br />
+            Username:
+            <br />
+            <input type="text" id="user" />
+            <br />
+            <br />
+            Birthday (mm/dd/yy):
+            <br />
+            <input type="date" id="birthday" onchange="checkBirthday(this)" />
+            <br />
+            <br />
+            Password:
+            <br />
+            <input type="password" name="Password" id="Password" onchange="checkPassword(this)" />
+            <script>
+                function checkFirstName(firstnameInput) {
+                    if (firstnameInput.value.length < 2) {
+                        firstnameInput.focus();
+                        alert("Your name is too short:" + firstnameInput.value);
+                    } else {
+                        firstnameInput.value = toProperCase(firstnameInput.value);
+                    }
+                }
+
+                function checkLastName(lastnameInput) {
+                    if (lastnameInput.value.length < 2) {
+                        lastnameInput.focus();
+                        alert("Your name is too short:" + lastnameInput.value);
+                    } else {
+                        lastnameInput.value = toProperCase(lastnameInput.value);
+                    }
+                }
+
+                function toProperCase(username) {
+                    return username.slice(0, 1).toUpperCase() + username.slice(1).toLowerCase();
+                }
+
+                function checkAge(ageInput) {
+                    if (ageInput.value < 5) {
+                        ageInput.value.focus();
+                        alert("Unfortunately, you must be older than 5 years old.:" + ageInput);
+                    }
+                    if (ageInput.value > 100) {
+                        ageInput.value.focus();
+                        alert("Unfortunately, you must be younger than 100 years old.:" + ageInput.value);
+                    }
+                }
+
+                function checkPassword(passwordInput) {
+                    if (passwordInput.value.length < 8) {
+                        alert("Your password needs to be at least 8 digits long.");
+                    }
+                    if (passwordInput.value === passwordInput.value.toLowerCase() || passwordInput.value === passwordInput.value.toUpperCase()) {
+                        alert("Your password needs to have mixed cases.");
+                    }
+                    let hasNumber = false;
+                    debugger;
+                    for (let h = 0; h < passwordInput.value.length; h++) {
+                        if (0 * passwordInput.value[h] === 0) {
+                            hasNumber = true;
+                            break;
+                        }
+                    }
+                    if (!hasNumber) {
+                        alert("Your password needs to have a number!");
+                    }
+                }
+
+                function gather() {
+                    let user = document.getElementById("user").value;
+                    let pass = document.getElementById("Password").value;
+                    let search = window.location.search;
+                    let params = new URLSearchParams(search);
+                    let yay = params.get("e");
+                    let info = {
+                        email: yay,
+                        username: user,
+                        password: pass,
+                    };
+                    fetch("/api/sign-up", {
+                        method: "post",
+                        headers: {
+                            Accept: "application/json, text/plain, */*",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(info),
+                    })
+                        .then((res) => res.json())
+                        .then((res) => console.log(res));
+                }
+            </script>
+            <br />
+            <br />
+            <button type="button" onclick="gather()">Get Quacking!</button>
+        </p>
+    </body>
+</html>
