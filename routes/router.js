@@ -15,22 +15,6 @@ const msgCollection = "msgs";
 
 const userMiddleware = require("../middleware/users.js");
 
-/*mongo.initialize(dbName, userCollection, function(userColl) { // successCallback
-    // get all items
-    userColl.find().toArray(function(err, result) {
-        if (err) throw err;
-          console.log(result);
-    });
-})
-
-mongo.initialize(dbName, msgCollection, function(msgColl) { // successCallback
-    // get all items
-    msgColl.find().toArray(function(err, result) {
-        if (err) throw err;
-          console.log(result)
-    });
-})*/
-
 router.get("/read-message", userMiddleware.isLoggedIn, (req, res, next) => {
 
 });
@@ -59,13 +43,38 @@ mongo.initialize(dbName, userCollection, function(userColl) { // successCallback
     });
 
 router.post("/sign-up", userMiddleware.validateRegister, (req, res, next) => {
-  const item = req.body;
-    userColl.insertOne(item, (error, result) => { // callback of insertOne
-        if (error) throw error;
-        console.log(result)
-    });
-});
+ const item = req.body;
+ const username = req.body.username;
+ userColl.find(username).toArray((error, result) => {
+    if (result.length) {
+      return res.status(409).send({
+        msg: "This username is already in use!",
+      });
+    } else {
+      bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if (err) {
+          return res.status(500).send({
+            msg: err,
+          });
+        } else {
+          console.log("Proceed to insert" + item);
+           userColl.insertOne(item, (error, result) => {
+            if (error) {
+              throw error;
+              return res.status(400).send({
+                msg: error,
+              });
+            }
+            return res.status(201).send({
+              msg: "Registered!",
+            });
+          });
+        }
+      });
+    }
+  });
 })
+});
 
 router.post("/login", (req, res, next) => {
 
