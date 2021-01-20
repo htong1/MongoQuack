@@ -15,9 +15,19 @@ const msgCollection = "msgs";
 
 const userMiddleware = require("../middleware/users.js");
 
+mongo.initialize(dbName, msgCollection, function(msgColl) {
+  msgColl.find().toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result)
+  });
 router.get("/read-message", userMiddleware.isLoggedIn, (req, res, next) => {
-
+    msgColl.find().toArray((error, result) => { // callback of find
+            if (error) throw error;
+            console.log(result)
+            res.json(result);
+        });
 });
+})
 
 router.get("/read-yourmessage", userMiddleware.isLoggedIn, (req, res, next) => {
 
