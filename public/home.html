@@ -25,13 +25,12 @@
 			float: right;
 		}
 	</style>
-	<script src="he.js">
+	<!--<script src="he.js">-->
 
 	</script>
 	<script>
 		function message() {
                 let post = document.getElementById("post").value;
-                post = he.encode(post);
                 let tok = localStorage.getItem("token");
                 let info = {
                     message: post,
@@ -71,111 +70,6 @@
                         console.log("yay");
                     });
             }
-
-            let othermsg = setInterval(readMessages, 3000);
-
-             function readMessages() {
-                let feed = document.getElementById("feed");
-                let tok = localStorage.getItem("token");
-                fetch("/api/read-message", {
-                    method: "get",
-                    headers: {
-                        Authorization: "bearer " + tok,
-                        Accept: "application/json, text/plain, */*",
-                        "Content-Type": "application/json",
-                    },
-                })
-                    .then((res) => res.json())
-                    .then((res) => {
-                        console.log("lengthhhh" + res.length);
-                        displayFeed(res, feed);
-                    });
-            }
-
-            function callyourMessages(){
-
-            }
-
-                let yourmsg = setInterval(readyourMessages, 3000);
-                
-                function readyourMessages() {
-                let feed = document.getElementById("feed");
-                let tok = localStorage.getItem("token");
-                fetch("/api/read-yourmessage", {
-                    method: "get",
-                    headers: {
-                        Authorization: "bearer " + tok,
-                        Accept: "application/json, text/plain, */*",
-                        "Content-Type": "application/json",
-                    },
-                })
-                    .then((res) => res.json())
-                    .then((res) => {
-                        displayFeed(res, feed);
-                    });
-            }
-
-
-            function displayFeed(res, feed) {
-                let tblHtml = `
-    <center>
-    <div>`;
-                for (const k of res) {
-                    tblHtml += createRow(k);
-                }
-                tblHtml += `</div></center>`;
-                feed.innerHTML = tblHtml;
-            }
-
-            function createRow(k) {
-                let time = new Date(k.posted_at);
-                let date = new Date(k.posted_at);
-                date = date.getTime();
-                let current = new Date();
-                current = current.getTime();
-                let age = current - date;
-                age = age / 60000;
-                if (age <= 60) {
-                    age = Math.floor(age) + " minutes ago";
-                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:400x;height:100px;border:1px solid;" id = "followbutton" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br>Posted at:${time} <br><p>Posted:</p> ${age}<br><div onclick="like(${k.id});">❤</div>${k.post_likes}</center>`;
-                } else if (age >= 60 && age < 1440) {
-                    age = age / 60;
-                    age = Math.floor(age) + " hours ago";
-                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:400px;height:100px;border:1px solid;" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br><p>Posted at:</p>${time} <br><p>Posted:</p>${age}<br><div onclick="like(${k.id});">❤</div>${k.post_likes}</center>`;
-                } else {
-                    age = age / 1440;
-                    age = Math.floor(age) + " days ago";
-                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:400px;height:100px;border:1px solid;" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br><p>Posted at:</p>${time} <br><p>Posted:</p>${age}<br>
-      <div onclick="like(${k.id});">❤</div>${k.post_likes}<br></center>`;
-                }
-            }
-
-            //function logout() {}
-
-      function follow(authorid){
-              let write = document.getElementById("write").innerHTML;              
-              let tok = localStorage.getItem("token");
-              let info = {
-                   followedId:authorid
-               };
-               fetch("/api/follow-user", {
-                  method: "post",
-                   headers: {
-                       Authorization: "bearer " + tok,
-                       Accept: "application/json, text/plain, */*",
-                       "Content-Type": "application/json",
-                   },
-                   body: JSON.stringify(info),
-               })
-                   .then((res) => res.json())
-                   .then((res) => {
-                       console.log(res);
-                   });
-           }
-
-           function write(){
-            
-           }
 	</script>
 </head>
 
@@ -204,7 +98,7 @@
             <textarea id="post" rows="10" cols="70">Quack, quack, quack... ᕕ( ᐛ )ᕗ</textarea>
             <br />
             <br />
-            <button type="button" id="post" onclick="message()">Quack!</button>
+            <button type="button" onclick="message()">Quack!</button>
             <br />
             <br />
             <div id="feed"></div>
