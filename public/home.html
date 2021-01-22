@@ -34,6 +34,7 @@
                 let tok = localStorage.getItem("token");
                 let info = {
                     message: post,
+                    posted_at: (new Date()).getTime()
                 };
                 fetch("/api/post-message", {
                     method: "post",
@@ -87,6 +88,7 @@
                     .then((res) => res.json())
                     .then((res) => {
                         console.log("lengthhhh" + res.length);
+                        console.log(res)
                         displayFeed(res, feed);
                     });
             }
@@ -97,22 +99,23 @@
     <div>`;
                 for (const k of res) {
                     tblHtml += createRow(k);
+                    console.log(k)
                 }
                 tblHtml += `</div></center>`;
                 feed.innerHTML = tblHtml;
             }
 
             function createRow(k) {
-                let time = new Date(k.posted_at);
-                let date = new Date(k.posted_at);
-                date = date.getTime();
+                let time = new Date(k.posted_at)
+                let date = k.posted_at;
+                console.log(date)
                 let current = new Date();
                 current = current.getTime();
                 let age = current - date;
                 age = age / 60000;
                 if (age <= 60) {
                     age = Math.floor(age) + " minutes ago";
-                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:400x;height:100px;border:1px solid;" id = "followbutton" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br>Posted at:${time} <br><p>Posted:</p> ${age}<br><div onclick="like(${k.id});">❤</div>${k.post_likes}</center>`;
+                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:450x;height:150px;border:1px solid;" id = "followbutton" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br>Posted at:${time} <br><p>Posted:</p> ${age}<br><div onclick="like(${k.id});">❤</div>${k.post_likes}</center>`;
                 } else if (age >= 60 && age < 1440) {
                     age = age / 60;
                     age = Math.floor(age) + " hours ago";

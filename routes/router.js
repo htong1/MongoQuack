@@ -23,7 +23,6 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
 router.get("/read-message", userMiddleware.isLoggedIn, (req, res, next) => {
     msgColl.find().toArray((error, result) => { // callback of find
             if (error) throw error;
-            console.log(result)
             res.json(result);
         });
 });
@@ -40,8 +39,13 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
   });
   router.post("/post-message", userMiddleware.isLoggedIn, (req, res, next) => {
     console.log("about to post message");
-    const message = req.body;
-    msgColl.insertOne(message, (error, result) => {
+    let item = {
+      author: req.userData.username,
+      message: req.body.message,
+      posted_at: req.body.posted_at
+    }
+    console.log(item.posted_at)
+    msgColl.insertOne(item, (error, result) => {
       if (error) {
         throw error;
         return res.status(400).send({

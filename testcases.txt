@@ -1,0 +1,7 @@
+const mongo = require("./lib/db.js");
+
+mongo.initialize('msgsdb', 'msgs', function (msgColl) {
+  msgColl.find({author: 'welp'}).toArray(function (err, result) {  
+     console.log(result[0].posted_at.getTime());
+  })  
+})
