@@ -5,3 +5,42 @@ mongo.initialize('msgsdb', 'msgs', function (msgColl) {
      console.log(result[0].posted_at.getTime());
   })  
 })
+
+
+const mongo = require("./lib/db.js");
+mongo.initialize('msgsdb', 'msgs', function (msgColl) {
+  msgColl.find({author: 'welp'}).toArray(function (err, result) {  
+     console.log(result[0]);
+  })  
+})
+
+
+
+mongo.initialize('msgsdb', 'msgs', function (msgColl) {
+  msgColl.updateOne({author: 'welp'},{likes: 11}, { upsert: true} ,function (err, result) {  
+     if (err) throw err;  
+     console.log(result);
+  })  
+})
+
+
+db.initialize(dbName, collectionName, function (coll) {
+  coll.update({_id: 'tt0109830'},{likes: 11}, function (err, result) {  
+     if (err) throw err;  
+     console.log(result);
+  })  
+})
+
+
+const mongo = require("./lib/db.js");
+ObjectId = require('mongodb').ObjectID;
+mongo.initialize('msgsdb', 'msgs', function (msgColl) {
+  msgColl.update(
+  {_id: ObjectId('600a5363af2a21081038921d')},
+  {$set: {likes: 13}}, 
+  {upsert: true}, 
+  function (err, result) {  
+     if (err) throw err;  
+     console.log(result);
+  })  
+})

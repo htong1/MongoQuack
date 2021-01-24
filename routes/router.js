@@ -11,6 +11,8 @@ const mongo = require("../lib/db.js");
 const dbName = "msgsdb";
 const userCollection = "users";
 const msgCollection = "msgs";
+ObjectId = require('mongodb').ObjectID;
+
 
 
 const userMiddleware = require("../middleware/users.js");
@@ -20,12 +22,12 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
     if (err) throw err;
     console.log(result)
   });
-router.get("/read-message", userMiddleware.isLoggedIn, (req, res, next) => {
+  router.get("/read-message", userMiddleware.isLoggedIn, (req, res, next) => {
     msgColl.find().toArray((error, result) => { // callback of find
-            if (error) throw error;
-            res.json(result);
-        });
-});
+      if (error) throw error;
+      res.json(result);
+    });
+  });
 })
 
 router.get("/read-yourmessage", userMiddleware.isLoggedIn, (req, res, next) => {
@@ -59,8 +61,27 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
   });
 })
 
-router.post("/like-message", userMiddleware.isLoggedIn, (req, res, next) => {
-
+mongo.initialize(dbName, msgCollection, function(msgColl) {
+  msgColl.find().toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result)
+  })
+  router.post("/like-message", userMiddleware.isLoggedIn, (req, res, next) => {
+    let l = req.body.likes;
+    l = l + 1;
+    console.log("about to like");
+    console.log(req.body.id)
+    msgColl.update(
+      { _id: ObjectId(req.body.id) },
+      { $set: { likes: l } },
+      { upsert: true },
+      function(err, result) {
+        if (err) throw err;
+      });
+      res.status(202).send({
+        msg: "liked"
+      })
+  });
 });
 
 router.post("/follow-user", userMiddleware.isLoggedIn, (req, res, next) => {
@@ -92,9 +113,9 @@ mongo.initialize(dbName, userCollection, function(userColl) { // successCallback
             });
           } else {
             let newPass = {
-               email:req.body.email,
-               username:req.body.username,
-               password:hash
+              email: req.body.email,
+              username: req.body.username,
+              password: hash
             }
             console.log("Proceed to insert" + newPass);
             userColl.insertOne(newPass, (error, result) => {
