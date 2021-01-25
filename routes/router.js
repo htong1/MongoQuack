@@ -67,23 +67,43 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
     console.log(result)
   })
   router.post("/like-message", userMiddleware.isLoggedIn, (req, res, next) => {
-    let l = req.body.likes;
-    l = l + 1;
-    console.log("about to like");
-    console.log(req.body.id)
-    msgColl.update(
+    console.log(req.body.liker)
+    msgColl.find({_id:ObjectId(req.body.id)}).toArray(function (err, result) {
+    if (err) throw err;
+    console.log(result[0])
+    let arr = result.likers;
+    if(arr == undefined){
+      msgColl.update(
       { _id: ObjectId(req.body.id) },
-      { $set: { likes: l } },
+      { $set: { likes: 1 } },
       { upsert: true },
       function(err, result) {
         if (err) throw err;
       });
-      res.status(202).send({
+       res.status(202).send({
         msg: "liked"
-      })
+    })
+    } else {
+        if (arr.contains(req.body.liker)){
+      console.log("you've already liked!")
+    } else {
+  msgColl.update(
+  {_id: ObjectId(req.body.id)},
+  {$inc: {likes: 1}, $push: {likers: req.body.liker}},
+  {upsert: true},
+  function (err, result) {  
+     if (err) throw err;  
+     console.log(result);
+  })  
+   res.status(202).send({
+        msg: "liked"
+    })
+    }
+    }
+  })  
+ 
+  })
   });
-});
-
 router.post("/follow-user", userMiddleware.isLoggedIn, (req, res, next) => {
 
 });

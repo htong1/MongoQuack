@@ -44,3 +44,60 @@ mongo.initialize('msgsdb', 'msgs', function (msgColl) {
      console.log(result);
   })  
 })
+
+
+ /*let l = req.body.likes;
+    l = l + 1;
+    console.log("about to like");
+    console.log(req.body.id)
+    msgColl.update(
+      { _id: ObjectId(req.body.id) },
+      { $set: { likes: l } },
+      { upsert: true },
+      function(err, result) {
+        if (err) throw err;
+      });
+      res.status(202).send({
+        msg: "liked"
+      })*/
+
+
+
+      mongo.initialize(dbName, msgCollection, function(msgColl) {
+  msgColl.find().toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result)
+  })
+  router.post("/like-message", userMiddleware.isLoggedIn, (req, res, next) => {
+    msgColl.find({_id:ObjectId(req.body.id)}).toArray(function (err, result) {
+    if (err) throw err;
+    console.log(result[0])
+    let arr = result.likers;
+    /*if(arr == undefined){
+      msgColl.update(
+      { _id: ObjectId(req.body.id) },
+      { $set: { likes: l } },
+      { upsert: true },
+      function(err, result) {
+        if (err) throw err;
+      });
+    }*/
+  })  
+    if (arr.includes(req.body.email)){
+      console.log("you've already liked!")
+    } else {
+  msgColl.update(
+  {_id: ObjectId(req.body.id)},
+  {$inc: {likes: 1}, $push: {likers: req.body.email}},
+  {upsert: true},
+  function (err, result) {  
+     if (err) throw err;  
+     console.log(result);
+  })  
+    }
+  res.status(202).send({
+        msg: "liked"
+    })
+ 
+  })
+  });
