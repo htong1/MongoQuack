@@ -23,9 +23,19 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
     console.log(result)
   });
   router.get("/read-message", userMiddleware.isLoggedIn, (req, res, next) => {
-    msgColl.find().toArray((error, result) => { // callback of find
+    msgColl.find().toArray((error, messages) => { // callback of find
       if (error) throw error;
-      res.json(result);
+      for(message of messages){
+        if (message.likersId == undefined || !message.likersId.includes(req.userData.userId)){
+          message.liked = false;
+        } else {
+          message.liked = true;
+        }
+      }
+      console.log("UserId" + req.userData.userId)
+      console.log("likersId" + message.likersId)
+      console.log("/is message liked?" + message.liked)
+      res.json(messages);
     });
   });
 })
@@ -67,43 +77,25 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
     console.log(result)
   })
   router.post("/like-message", userMiddleware.isLoggedIn, (req, res, next) => {
-    console.log(req.body.liker)
-    msgColl.find({_id:ObjectId(req.body.id)}).toArray(function (err, result) {
-    if (err) throw err;
-    console.log(result[0])
-    let arr = result.likers;
-    if(arr == undefined){
-      msgColl.update(
-      { _id: ObjectId(req.body.id) },
-      { $set: { likes: 1 } },
-      { upsert: true },
-      function(err, result) {
-        if (err) throw err;
-      });
-       res.status(202).send({
-        msg: "liked"
-    })
-    } else {
-        if (arr.contains(req.body.liker)){
-      console.log("you've already liked!")
-    } else {
-  msgColl.update(
-  {_id: ObjectId(req.body.id)},
-  {$inc: {likes: 1}, $push: {likers: req.body.liker}},
-  {upsert: true},
-  function (err, result) {  
-     if (err) throw err;  
-     console.log(result);
-  })  
-   res.status(202).send({
-        msg: "liked"
-    })
-    }
-    }
-  })  
- 
+    console.log(req.body.liked)
+      if(req.body.liked == false){
+          msgColl.update(
+            { _id: ObjectId(req.body.id) },
+            { $inc: { likes: 1 }, $push: { likersId: req.userData.userId} },
+            { upsert: true },
+            function(err, result) {
+              if (err) throw err;
+              console.log(result);
+            })
+      } else {
+          res.status(202).send({
+            msg: "liked"
+          })
+      }
+        })
   })
-  });
+
+
 router.post("/follow-user", userMiddleware.isLoggedIn, (req, res, next) => {
 
 });
@@ -182,6 +174,7 @@ mongo.initialize(dbName, userCollection, function(userColl) { // successCallback
       // check password
       bcrypt.compare(req.body.password, result[0]["password"], (bErr, bResult) => {
         // wrong password
+        //console.log("result 0" + result[0])
         if (bErr) {
           throw bErr;
           return res.status(401).send({
@@ -192,7 +185,7 @@ mongo.initialize(dbName, userCollection, function(userColl) { // successCallback
           const token = jwt.sign(
             {
               username: result[0].username,
-              userId: result[0].id,
+              userId: result[0].email,
             },
             "SECRETKEY",
             {

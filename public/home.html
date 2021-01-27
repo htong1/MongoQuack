@@ -51,12 +51,13 @@
                     });
             }
 
-            function like(id, likes, email) {
+            function like(id, likes, email, liked) {
                 let tok = localStorage.getItem("token");
                 let info = {
                     "id": id,
                     "likes":likes,
                     "liker":email,
+                    "liked":liked,
                 };
                 fetch("/api/like-message", {
                     method: "post",
@@ -123,16 +124,16 @@
                 age = age / 60000;
                 if (age <= 60) {
                     age = Math.floor(age) + " minutes ago";
-                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:450x;height:150px;border:1px solid;" id = "followbutton" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br>Posted at:${time} <br><p>Posted:</p> ${age}<br><div onclick="like('${k._id}', ${k.likes},'${k.author}');">❤</div>${k.likes}</center>`;
+                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:450x;height:150px;border:1px solid;" id = "followbutton" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br>Posted at:${time} <br><p>Posted:</p> ${age}<br><div onclick="like('${k._id}', ${k.likes},'${k.author}', ${k.liked});">❤</div>${k.likes}</center>`;
                 } else if (age >= 60 && age < 1440) {
                     age = age / 60;
                     age = Math.floor(age) + " hours ago";
-                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:400px;height:100px;border:1px solid;" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br><p>Posted at:</p>${time} <br><p>Posted:</p>${age}<br><div onclick="like('${k._id}', ${k.likes}, '${k.author}');">❤</div>${k.likes}</center>`;
+                    return `<b>${k.author}</b>: <span style="border-radius: 12px;width:400px;height:100px;border:1px solid;" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br><p>Posted at:</p>${time} <br><p>Posted:</p>${age}<br><div onclick="like('${k._id}', ${k.likes}, '${k.author}', ${k.liked});">❤</div>${k.likes}</center>`;
                 } else {
                     age = age / 1440;
                     age = Math.floor(age) + " days ago";
                     return `<b>${k.author}</b>: <span style="border-radius: 12px;width:400px;height:100px;border:1px solid;" onclick="follow('${k.authorid}')">Follow</span><center><br> ${k.message} <br><p>Posted at:</p>${time} <br><p>Posted:</p>${age}<br>
-      <div onclick="like('${k._id}', ${k.likes}, '${k.author}');">❤</div>${k.likes}<br></center>`;
+      <div onclick="like('${k._id}', ${k.likes}, '${k.author}', ${k.liked});">❤</div>${k.likes}<br></center>`;
                 }
             }
 

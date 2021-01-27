@@ -23,6 +23,8 @@ module.exports = {
             //console.log("this is the token: " + token);
             const decoded = jwt.verify(token, "SECRETKEY");
             req.userData = decoded;
+            //console.log("Is logged in? userData" + req.userData.userId);
+            //console.log("decoded token" + JSON.stringify(decoded))
             next();
         } catch (err) {
             return res.status(401).send({
