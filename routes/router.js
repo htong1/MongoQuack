@@ -13,28 +13,19 @@ const userCollection = "users";
 const msgCollection = "msgs";
 ObjectId = require('mongodb').ObjectID;
 
-
-
 const userMiddleware = require("../middleware/users.js");
 
 mongo.initialize(dbName, msgCollection, function(msgColl) {
-  msgColl.find().toArray(function(err, result) {
-    if (err) throw err;
-    console.log(result)
-  });
   router.get("/read-message", userMiddleware.isLoggedIn, (req, res, next) => {
-    msgColl.find().toArray((error, messages) => { // callback of find
-      if (error) throw error;
+     msgColl.find().toArray((err, messages) => {
       for(message of messages){
         if (message.likersId == undefined || !message.likersId.includes(req.userData.userId)){
           message.liked = false;
         } else {
           message.liked = true;
         }
+        message.likersId = null;
       }
-      console.log("UserId" + req.userData.userId)
-      console.log("likersId" + message.likersId)
-      console.log("/is message liked?" + message.liked)
       res.json(messages);
     });
   });
@@ -45,10 +36,6 @@ router.get("/read-yourmessage", userMiddleware.isLoggedIn, (req, res, next) => {
 });
 
 mongo.initialize(dbName, msgCollection, function(msgColl) {
-  msgColl.find().toArray(function(err, result) {
-    if (err) throw err;
-    console.log(result)
-  });
   router.post("/post-message", userMiddleware.isLoggedIn, (req, res, next) => {
     console.log("about to post message");
     let item = {
@@ -72,10 +59,6 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
 })
 
 mongo.initialize(dbName, msgCollection, function(msgColl) {
-  msgColl.find().toArray(function(err, result) {
-    if (err) throw err;
-    console.log(result)
-  })
   router.post("/like-message", userMiddleware.isLoggedIn, (req, res, next) => {
     console.log(req.body.liked)
       if(req.body.liked == false){
@@ -95,18 +78,23 @@ mongo.initialize(dbName, msgCollection, function(msgColl) {
         })
   })
 
-
+mongo.initialize(dbName, userCollection, function(userColl) {
 router.post("/follow-user", userMiddleware.isLoggedIn, (req, res, next) => {
-
+    userColl.update(
+            {email:req.userData.userId},
+            { $inc: { followers: 1 }, $push: { following: req.body.followedId} },
+            { upsert: true },
+            function(err, result) {
+              if (err) throw err;
+              console.log(result);
+            })
+            return res.status(201).send({
+            msg: "Following!"
+        });
 });
+})
 
-mongo.initialize(dbName, userCollection, function(userColl) { // successCallback
-  // get all items
-  userColl.find().toArray(function(err, result) {
-    if (err) throw err;
-    console.log(result);
-  });
-
+mongo.initialize(dbName, userCollection, function(userColl) {
   router.post("/sign-up", userMiddleware.validateRegister, (req, res, next) => {
     console.log("Proceed to find username");
     userColl.find({ $or: [{ email: req.body.email }, { username: req.body.username }] }).toArray((error, result) => {
@@ -148,13 +136,7 @@ mongo.initialize(dbName, userCollection, function(userColl) { // successCallback
   })
 });
 
-mongo.initialize(dbName, userCollection, function(userColl) { // successCallback
-  // get all items
-  userColl.find().toArray(function(err, result) {
-    if (err) throw err;
-    console.log(result);
-  });
-
+mongo.initialize(dbName, userCollection, function(userColl) {
   router.post("/login", (req, res, next) => {
     console.log("entering/logging in with " + req.body.username);
     console.log(req.body);
